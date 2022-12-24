@@ -19,6 +19,7 @@ class DashboardController extends Controller
      */
     public function index() {
         $data = $this->dashRepository->prepareData();
+
         return view('dashboard', $data);
     }
 }

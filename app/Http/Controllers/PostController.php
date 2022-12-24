@@ -24,6 +24,7 @@ class PostController extends Controller
      */
     public function index(Request $request) {
         $data = $this->postsRepo->getAllPostsPaginated();
+
         return view('home', ['posts' => $data]);
     }
 
@@ -34,7 +35,9 @@ class PostController extends Controller
      */
     public function create(CreatePostRequest $request) {
         $this->postsRepo->create($request->validated());
+
         Alert::success('Success!', 'Post Created Successfully');
+
         return redirect(RouteServiceProvider::HOME);
     }
 }
