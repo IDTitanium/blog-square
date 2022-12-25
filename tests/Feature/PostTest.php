@@ -6,6 +6,8 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class PostTest extends TestCase
@@ -79,5 +81,50 @@ class PostTest extends TestCase
         $response->assertStatus(200);
 
         $response->assertViewHas('posts', Post::where('user_id', $user->id)->paginate(20));
+    }
+
+    public function test_can_poll_blogposts_for_external_service()
+    {
+        Artisan::call('db:seed --class=AdminUserSeeder');
+
+        Http::fake([
+            'https://candidate-test.sq1.io/api.php' => Http::response($this->getMockBody(), 200)
+        ]);
+
+        Artisan::call('poll:blogpost');
+
+        $adminUser = User::where('name', User::ADMIN)->first();
+
+        $this->assertDatabaseHas('posts', [
+            'user_id' => $adminUser->id,
+            'title' => "Title 1"
+        ]);
+
+        $this->assertDatabaseHas('posts', [
+            'user_id' => $adminUser->id,
+            'title' => "Title 2"
+        ]);
+    }
+
+    private function getMockBody()
+    {
+        return [
+            "status" => "ok",
+            "count" => 2,
+            "articles" => [
+                [
+                    "id" => 1,
+                    "title" => "Title 1",
+                    "description" => "It's not too late for the U.S. to do something about it.",
+                    "publishedAt" => "2022-08-31T09:45:01Z"
+                ],
+                [
+                    "id" => 2,
+                    "title" => "Title 2",
+                    "description" => "There's consensus that the 'energy transition' will involve fossil fuels for a long time to come, 'otherwise civilization will crumble,' Tesla CEO Elon Musk said in Norway.",
+                    "publishedAt" => "2022-08-31T09:45:01Z"
+                ]
+            ]
+        ];
     }
 }
