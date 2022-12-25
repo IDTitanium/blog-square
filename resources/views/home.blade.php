@@ -40,7 +40,7 @@
             @foreach($posts as $post)
                 <tr>
                     <td>{{ $post->title }}</td>
-                    <td>{{ $post->description }}</td>
+                    <td>{!! $post->description !!}</td>
                     <td>{{ $post->user_name }} </td>
                     <td>{{\Carbon\Carbon::parse($post->published_at) }}</td>
                 </tr>

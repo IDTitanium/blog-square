@@ -3,16 +3,22 @@
 namespace App\Repositories;
 
 use App\Models\Post;
+use Illuminate\Support\Facades\Cache;
 
 class PostRepository
 {
     const PAGE_SIZE = 20;
+    const CACHE_TTL = 60;
     /**
      * Get all post paginated
      * @return \App\Models\Post
      */
     public function getAllPostsPaginated() {
-        return Post::sortable()->paginate(static::PAGE_SIZE);
+        $key = Post::getCacheKey();
+
+        return Cache::remember($key, static::CACHE_TTL, function () {
+            return Post::sortable()->paginate(static::PAGE_SIZE);
+        });
     }
 
     /**
