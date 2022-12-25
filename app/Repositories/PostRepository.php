@@ -25,7 +25,8 @@ class PostRepository
             'user_id' => $data['user_id'] ?? auth()->id(),
             'title' => $data['title'],
             'description' => $data['description'],
-            'published_at' => now()
+            'published_at' => $data['published_at'] ?? now(),
+            'external_post_id' => $data['external_post_id'] ?? null
         ]);
     }
 
@@ -37,5 +38,14 @@ class PostRepository
         return Post::sortable()
                 ->where('user_id', auth()->id())
                 ->paginate(static::PAGE_SIZE);
+    }
+
+    /**
+     * Check existence of a post by its external_post_id
+     * @param int $externalId
+     * @return bool
+     */
+    public function postExistsByExternalId($externalId) {
+        return Post::where('external_post_id', $externalId)->exists();
     }
 }

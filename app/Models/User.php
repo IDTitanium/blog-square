@@ -12,6 +12,9 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    const ADMIN = 'admin';
+    const ADMIN_EMAIL = 'admin@blog-square.co.uk';
+
     /**
      * The attributes that are mass assignable.
      *
