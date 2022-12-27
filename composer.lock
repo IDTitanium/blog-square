@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e88d33a35944948b1b2cfc753d526ec",
+    "content-hash": "1c274e49ca742b61df3f0a424b6adb98",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -5612,6 +5612,70 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "wendelladriel/laravel-validated-dto",
+            "version": "v2.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/WendellAdriel/laravel-validated-dto.git",
+                "reference": "838adc26632ff7ee6133be2ae0c6fb4958a8ecdb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/WendellAdriel/laravel-validated-dto/zipball/838adc26632ff7ee6133be2ae0c6fb4958a8ecdb",
+                "reference": "838adc26632ff7ee6133be2ae0c6fb4958a8ecdb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "illuminate/console": "^7.0|^8.0|^9.0",
+                "illuminate/database": "^7.0|^8.0|^9.0",
+                "illuminate/http": "^7.0|^8.0|^9.0",
+                "illuminate/support": "^7.0|^8.0|^9.0",
+                "illuminate/validation": "^7.0|^8.0|^9.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^7.15",
+                "pestphp/pest": "^1.22",
+                "pestphp/pest-plugin-faker": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "WendellAdriel\\ValidatedDTO\\Providers\\ValidatedDTOServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WendellAdriel\\ValidatedDTO\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wendell Adriel",
+                    "email": "wendelladriel.ti@gmail.com"
+                }
+            ],
+            "description": "Data Transfer Objects with validation for Laravel applications",
+            "keywords": [
+                "Data Transfer Object",
+                "dto",
+                "laravel",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/WendellAdriel/laravel-validated-dto/issues",
+                "source": "https://github.com/WendellAdriel/laravel-validated-dto"
+            },
+            "time": "2022-12-27T14:01:26+00:00"
         }
     ],
     "packages-dev": [

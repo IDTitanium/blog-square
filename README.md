@@ -20,7 +20,7 @@ Other supporting libraries includes: Bootstrap CSS, Laravel Breeze and Font Awes
     - `php artisan key:generate` to generate application key
     - `php artisan breeze:install` to install the Laravel breeze library
     - `npm install` to install Javascript dependencies
-    - `npm run dev` to run the Javascript dependencies
+    - `npm run dev` to run/build the Javascript dependencies
 
 ## Database Setup
 - Setup database credentials in the environment variable.
@@ -31,6 +31,7 @@ Other supporting libraries includes: Bootstrap CSS, Laravel Breeze and Font Awes
 ## Scheduler Setup
 - The project contains a scheduled job (cron) that runs every fifteen minutes for polling blog post from external API.
     - Run the command `php artisan schedule:work` to run the cron continously.
+    - To instantly single the cron command once, you can run the command `php artisan poll:blogpost`.
 
 ## Testing
 To run the tests, you can run `php artisan test` this will run all the available test on the project.

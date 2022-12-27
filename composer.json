@@ -13,7 +13,8 @@
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "realrashid/sweet-alert": "^5.1"
+        "realrashid/sweet-alert": "^5.1",
+        "wendelladriel/laravel-validated-dto": "^2.2"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

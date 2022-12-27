@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\DTOs\PostDTO;
 use App\Models\User;
 use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
@@ -44,16 +45,23 @@ class PollBlogPost extends Command
      */
     public function handle(PostRepository $postRepository)
     {
-        $response = $this->fetchBlogPostViaExternalApi() ?? [];
+        try {
+            $response = $this->fetchBlogPostViaExternalApi() ?? [];
 
-        if (isset($response['articles'])) {
-            $postStored = $this->storePosts($response, $postRepository);
-            if ($postStored) {
-                $this->info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
-                Log::info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
+            if (isset($response['articles'])) {
+                $postStored = $this->storePosts($response['articles'], $postRepository);
+                if ($postStored) {
+                    $this->info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
+                    Log::info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
+                }
             }
-        }
 
+        } catch (Exception $e) {
+            $this->info($e->getMessage());
+            Log::error($e->getMessage(), $e->getTrace());
+
+            return 1;
+        }
         return 0;
     }
 
@@ -64,11 +72,12 @@ class PollBlogPost extends Command
     private function fetchBlogPostViaExternalApi() {
         try {
             $blogPostEndpoint = config('blogconfig.feed_server_api');
-            $posts = Http::get($blogPostEndpoint)->json();
+            $response = Http::get($blogPostEndpoint)->json();
 
-            return $posts;
+            return $response;
         } catch (Exception $e) {
-            Log::error("Blog posts could not be fetched", $e->getTrace());
+            $this->info("An error occured, ". $e->getMessage());
+            Log::error("Blog posts could not be fetched, ".$e->getMessage(), $e->getTrace());
         }
     }
 
@@ -91,7 +100,7 @@ class PollBlogPost extends Command
 
             return $adminUser;
         } catch (Exception $e) {
-            Log::error("Admin user could not be retrieved", $e->getTrace());
+            Log::error("Admin user could not be retrieved, ". $e->getMessage(), $e->getTrace());
         }
     }
 
@@ -101,9 +110,9 @@ class PollBlogPost extends Command
      * @param mixed $postRepository
      * @return bool
      */
-    private function storePosts($response, $postRepository) {
+    private function storePosts($posts, $postRepository) {
         try {
-            foreach ($response['articles'] as $post) {
+            foreach ($posts as $post) {
 
                 if ($postRepository->postExistsByExternalId($post['id'])) {
                     continue;
@@ -112,18 +121,20 @@ class PollBlogPost extends Command
 
                 if (!$admin) return false;
 
+                $postDto = new PostDTO($post);
+
                 $postRepository->create([
                     'user_id' => $admin->id,
-                    'title' => $post['title'],
-                    'description' => $post['description'],
-                    'published_at' => $post['publishedAt'],
-                    'external_post_id' => $post['id']
+                    'title' => $postDto->title,
+                    'description' => $postDto->description,
+                    'published_at' => $postDto->publishedAt,
+                    'external_post_id' => $postDto->id
                 ]);
             }
 
             return true;
         } catch (Exception $e) {
-            Log::error("Blog posts could not be stored", $e->getTrace());
+            Log::error("Blog posts could not be stored, ".$e->getMessage(), $e->getTrace());
             return false;
         }
     }
