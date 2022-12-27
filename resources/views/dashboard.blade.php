@@ -35,20 +35,7 @@
                 </div>
                 <div class="p-6 bg-white border-b border-gray-200">
                 <h3 class="text-center">My Blog posts</h3>
-                    <table class="table">
-                        <tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>@sortablelink('published_at', 'Date of Publication')</th>
-                        </tr>
-                        @foreach($posts as $post)
-                            <tr>
-                                <td>{{ $post->title }}</td>
-                                <td>{{ $post->description }}</td>
-                                <td>{{\Carbon\Carbon::parse($post->published_at) }}</td>
-                            </tr>
-                        @endforeach
-                    </table>
+                    <x-posts-view :posts="$posts"/>
                 </div>
             </div>
         </div>

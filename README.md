@@ -28,10 +28,14 @@ Other supporting libraries includes: Bootstrap CSS, Laravel Breeze and Font Awes
     - `php artisan migrate` to run all migrations and create the required database tables.
     - `php artisan db:seed` this will only seed the Admin user in your database.
 
+## Scheduler Setup
+- The project contains a scheduled job (cron) that runs every fifteen minutes for polling blog post from external API.
+    - Run the command `php artisan schedule:work` to run the cron continously.
+
 ## Testing
 To run the tests, you can run `php artisan test` this will run all the available test on the project.
 
-The `PostTest` and `DashboardTest` contain most of the feature test for this  project.
+The `PostTest` and `DashboardTest` contain most of the feature tests for this  project, the others are authentication tests.
 
 
 ## Issues Reporting

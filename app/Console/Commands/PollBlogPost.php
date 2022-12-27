@@ -47,31 +47,23 @@ class PollBlogPost extends Command
         $response = $this->fetchBlogPostViaExternalApi() ?? [];
 
         if (isset($response['articles'])) {
-            foreach ($response['articles'] as $post) {
-
-                if ($postRepository->postExistsByExternalId($post['id'])) {
-                    continue;
-                }
-
-                $postRepository->create([
-                    'user_id' => $this->getSystemUser()->id,
-                    'title' => $post['title'],
-                    'description' => $post['description'],
-                    'published_at' => $post['publishedAt'],
-                    'external_post_id' => $post['id']
-                ]);
+            $postStored = $this->storePosts($response, $postRepository);
+            if ($postStored) {
+                $this->info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
+                Log::info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
             }
-
-            $this->info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
-            Log::info($response['count'] . " Blog posts polled successfully at " . now()->toDateTimeString());
         }
 
         return 0;
     }
 
+    /**
+     * Fetch posts via external api
+     * @return mixed
+     */
     private function fetchBlogPostViaExternalApi() {
         try {
-            $blogPostEndpoint = "https://candidate-test.sq1.io/api.php";
+            $blogPostEndpoint = config('blogconfig.feed_server_api');
             $posts = Http::get($blogPostEndpoint)->json();
 
             return $posts;
@@ -80,18 +72,59 @@ class PollBlogPost extends Command
         }
     }
 
+    /**
+     * Get system user for posts
+     * @return mixed
+     */
     private function getSystemUser() {
-        $userRepository = app()->make(UserRepository::class);
-        $adminUser = $userRepository->getUserByName(User::ADMIN);
+        try {
+            $userRepository = app()->make(UserRepository::class);
+            $adminUser = $userRepository->getUserByName(User::ADMIN);
 
-        if (!$adminUser) {
-            $adminUser = $userRepository->createUser([
-                'name' => User::ADMIN,
-                'email' => User::ADMIN_EMAIL,
-                'password' => Hash::make('password')
-            ]);
+            if (!$adminUser) {
+                $adminUser = $userRepository->createUser([
+                    'name' => User::ADMIN,
+                    'email' => User::ADMIN_EMAIL,
+                    'password' => Hash::make('password')
+                ]);
+            }
+
+            return $adminUser;
+        } catch (Exception $e) {
+            Log::error("Admin user could not be retrieved", $e->getTrace());
         }
+    }
 
-        return $adminUser;
+    /**
+     * Store posts from response
+     * @param mixed $response
+     * @param mixed $postRepository
+     * @return bool
+     */
+    private function storePosts($response, $postRepository) {
+        try {
+            foreach ($response['articles'] as $post) {
+
+                if ($postRepository->postExistsByExternalId($post['id'])) {
+                    continue;
+                }
+                $admin = $this->getSystemUser();
+
+                if (!$admin) return false;
+
+                $postRepository->create([
+                    'user_id' => $admin->id,
+                    'title' => $post['title'],
+                    'description' => $post['description'],
+                    'published_at' => $post['publishedAt'],
+                    'external_post_id' => $post['id']
+                ]);
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("Blog posts could not be stored", $e->getTrace());
+            return false;
+        }
     }
 }
